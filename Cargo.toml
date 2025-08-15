@@ -1,0 +1,12 @@
+[package]
+name = "cronwait"
+edition = "2024"
+homepage = "https://github.com/ehsan2003/cronwait"
+license = "MIT"
+readme = "README.md"
+version = "0.1.0"
+
+[dependencies]
+chrono = "0.4.41"
+clap = { version = "4.5.45", features = ["derive"] }
+cron = "0.15.0"
