@@ -16,7 +16,6 @@ use std::{error::Error, str::FromStr, time::Duration};
 ///   calculation fails.
 pub fn get_next_wait_duration(cron_expr: &str) -> Result<Duration, Box<dyn Error>> {
     let schedule = Schedule::from_str(cron_expr)?;
-
     let now = Local::now();
 
     let next_occurrence = schedule

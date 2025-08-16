@@ -27,7 +27,7 @@ struct Args {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let args = Args::parse();
+    let args = Args::try_parse()?;
 
     let duration = get_next_wait_duration(&args.cron_expr.trim())?;
 
