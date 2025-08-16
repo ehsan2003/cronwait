@@ -1,4 +1,4 @@
-use clap::{Parser, Subcommand};
+use clap::Parser;
 use std::{error::Error, thread};
 
 use cronwait::get_next_wait_duration;
@@ -7,47 +7,39 @@ use cronwait::get_next_wait_duration;
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 struct Args {
-    #[clap(subcommand)]
-    command: Commands,
-}
+    /// The cron expression to use.
+    cron_expr: String,
 
-#[derive(Subcommand, Debug)]
-enum Commands {
-    /// Prints the time in seconds until the next cron schedule.
-    Next {
-        /// The cron expression to check.
-        cron_expr: String,
+    /// Print the time in seconds until the next cron schedule instead of waiting.
+    /// An optional precision can be provided.
+    #[clap(
+        short = 'p',
+        long,
+        value_name = "PRECISION",
+        num_args = 0..=1,
+        default_missing_value = "0"
+    )]
+    print: Option<usize>,
 
-        /// The decimal precision for the output.
-        #[clap(short, long, value_parser, default_value_t = 0)]
-        precision: usize,
-    },
-    /// Waits for the time until the next cron schedule.
-    Wait {
-        /// The cron expression to wait for.
-        cron_expr: String,
-    },
+    /// Suppress verbose messages.
+    #[clap(short = 'q', long)]
+    quiet: bool,
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
-    match args.command {
-        Commands::Next {
-            cron_expr,
-            precision,
-        } => {
-            let duration = get_next_wait_duration(&cron_expr.trim())?;
+    let duration = get_next_wait_duration(&args.cron_expr.trim())?;
 
-            let total_seconds = duration.as_secs_f64();
-
-            println!("{:.precision$}", total_seconds);
-        }
-        Commands::Wait { cron_expr } => {
-            let duration = get_next_wait_duration(&cron_expr)?;
+    if let Some(precision) = args.print {
+        let total_seconds = duration.as_secs_f64();
+        println!("{:.precision$}", total_seconds);
+    } else {
+        if !args.quiet {
             eprintln!("Waiting for {:.2} seconds...", duration.as_secs_f64());
-            thread::sleep(duration);
-
+        }
+        thread::sleep(duration);
+        if !args.quiet {
             println!("Done.");
         }
     }
