@@ -37,7 +37,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             cron_expr,
             precision,
         } => {
-            let duration = get_next_wait_duration(&cron_expr)?;
+            let duration = get_next_wait_duration(&cron_expr.trim())?;
 
             let total_seconds = duration.as_secs_f64();
 
@@ -54,4 +54,3 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     Ok(())
 }
-
